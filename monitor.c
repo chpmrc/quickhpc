@@ -11,6 +11,12 @@
 # define PTRACE_CONT PT_CONTINUE
 #endif
 
+inline unsigned long gettime() {
+  volatile unsigned long tl;
+  asm __volatile__("lfence\nrdtsc" : "=a" (tl): : "%edx");
+  return tl;
+}
+
 void initPapi();
 void initEventSet(int *);
 void addEvent(int, char *eventName);
@@ -21,6 +27,7 @@ void cleanup(int *eventSet);
 int main( int argc, char *argv[] )
 {
         int eventSet = PAPI_NULL;
+        unsigned long t1, t2; // Used to measure timing of various calls
         int numEventSets = 1; // One set should be enough
         int idx;
         int retval;
@@ -77,15 +84,21 @@ int main( int argc, char *argv[] )
         /* Start monitoring and print values */
         printf("\n");
         for (idx = 0; processAlive && (idx < cfg.iterations || cfg.iterations == -1); idx++) {
+            t1 = gettime();
             monitor(eventSet, values, cfg.interval);
+            t2 = gettime();
+            printf("Time to monitor: %lu\n", t2 - t1);
             buildCSVLine(monitorLine, values[0], cfg.numEvents);
             printf("%s\n", monitorLine);
+            printf("Time to monitor: %lu\n", t2 - t1);
             if (kill(pid, 0) < 0) {
                 /* Process is not active anymore */
                 if (errno == ESRCH) {
                     processAlive = false;
                 }
             }
+            t2 = gettime();
+            printf("Time to end the loop: %lu\n", t2 - t1);
         }
         cleanup(&eventSet);
 
