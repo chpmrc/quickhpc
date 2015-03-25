@@ -16,6 +16,30 @@ where `OPTIONS` can be:
 * `-n` Number of iterations, each iteration lasts the duration of an interval
 * `-i` Interval for each measurement (i.e. time between then the hpc is start and stopped) in the order of microseconds
 
+The output of the program is organized as CSV data complete with headers and (for the time being) some debug prints at the top. An example follows:
+
+	Using config file: /home/user/events.conf
+	Monitoring the following events:
+	PAPI_TOT_INS
+	PAPI_L3_TCM
+	PAPI_L3_TCA
+	Monitoring for 10000 iterations
+	Attaching to PID: 5403
+	PAPI_TOT_INS,PAPI_L3_TCM,PAPI_L3_TCA
+	142948,9,307
+	128214,9,266
+	78173,69,363
+	124587,32,168
+	116464,38,209
+	126420,28,177
+	126188,27,133
+	118189,41,170
+	127132,25,179
+	130775,28,144
+	...
+
+Excellent format to be used for plotting, statistical analysis etc. in Octave/Matlab.
+
 # Example
 
 * Collect data during an openssl signature for 1000 iterations (each iteration is as fast as `papi_clockres` reports):
