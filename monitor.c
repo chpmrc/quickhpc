@@ -14,7 +14,7 @@
 void initPapi();
 void initEventSet(int *);
 void addEvent(int, char *eventName);
-void monitor(int, long long **values, int numEventSets, int useconds /* 0 means as fast as possible */);
+void monitor(int, long long **values, int useconds /* 0 means as fast as possible */);
 void buildCSVLine(char *line, long long *values, int numItems);
 void cleanup(int *eventSet);
 
@@ -27,8 +27,9 @@ int main( int argc, char *argv[] )
         long long **values;
         //long long elapsed_us, elapsed_cyc, elapsed_virt_us, elapsed_virt_cyc;
         char monitorLine[PAPI_MAX_STR_LEN];
-        pid_t pid;
+        pid_t pid = -1;
         config cfg;
+        bool processAlive = true;
 
         initPapi();
 
@@ -49,6 +50,10 @@ int main( int argc, char *argv[] )
             printf("Attaching to PID: %d\n", pid);
         }
 
+        if (pid < 0) {
+            printf("Please specify a PID to attach to with -a" /* or -r to run a process*/);
+        }
+
         initEventSet(&eventSet);
 
         for (idx = 0; idx < cfg.numEvents; idx++) {
@@ -62,23 +67,30 @@ int main( int argc, char *argv[] )
         values = allocate_test_space(numEventSets, cfg.numEvents);
 
         /* Print CSV headers */
+        printf("\n");
         for (idx = 0; idx < cfg.numEvents; idx++) {
             printf("%s", cfg.events[idx]);
             if (idx < cfg.numEvents - 1) {
                 printf(",");
             }
         }
+        /* Start monitoring and print values */
         printf("\n");
-
-        for (idx = 0; idx < cfg.iterations || cfg.iterations == -1; idx++) {
-            monitor(eventSet, values, cfg.numEvents, cfg.interval);
+        for (idx = 0; processAlive && (idx < cfg.iterations || cfg.iterations == -1); idx++) {
+            monitor(eventSet, values, cfg.interval);
             buildCSVLine(monitorLine, values[0], cfg.numEvents);
             printf("%s\n", monitorLine);
+            retval = kill(pid, 0);
+            if (kill(pid, 0) < 0) {
+                /* Process is not active anymore */
+                if (errno == ESRCH) {
+                    processAlive = false;
+                }
+            }
         }
-
         cleanup(&eventSet);
 
-        exit( 1 );
+        exit(0);
 }
 
 void initPapi(){
@@ -127,7 +139,7 @@ void addEvent(int eventSet, char *eventName) {
             test_fail_exit( __FILE__, __LINE__, "PAPI_add_event", retval );
 }
 
-void monitor(int eventSet, long long **values, int numEventSets, int useconds /* 0 means as fast as possible */) {
+void monitor(int eventSet, long long **values, int useconds /* 0 means as fast as possible */) {
     int retval;
 
     retval = PAPI_start( eventSet );
