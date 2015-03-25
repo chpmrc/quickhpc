@@ -18,4 +18,5 @@ config:
 	${CC} ${INC} -g -c config.c
 
 clean:
-	rm ${PROGRAM}
+	-rm ${PROGRAM}
+	-rm ${OBJS}

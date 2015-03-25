@@ -70,8 +70,8 @@ int main( int argc, char *argv[] )
         }
         printf("\n");
 
-        for (idx = 0; idx < 10; idx++) {
-            monitor(eventSet, values, cfg.numEvents, 0);
+        for (idx = 0; idx < cfg.iterations || cfg.iterations == -1; idx++) {
+            monitor(eventSet, values, cfg.numEvents, cfg.interval);
             buildCSVLine(monitorLine, values[0], cfg.numEvents);
             printf("%s\n", monitorLine);
         }
