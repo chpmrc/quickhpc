@@ -80,7 +80,6 @@ int main( int argc, char *argv[] )
             monitor(eventSet, values, cfg.interval);
             buildCSVLine(monitorLine, values[0], cfg.numEvents);
             printf("%s\n", monitorLine);
-            retval = kill(pid, 0);
             if (kill(pid, 0) < 0) {
                 /* Process is not active anymore */
                 if (errno == ESRCH) {

@@ -22,6 +22,10 @@ void readEventNames(char *filePath, config *cfg) {
 	int i = 0;
 	FILE *fp;
 	fp = fopen(filePath, "r");
+	if (fp == NULL) {
+		perror("Configuration file error:");
+		exit(1);
+	}
 	while (fscanf(fp, "%s", cfg->events[i]) != EOF){
 		i++;
 	}
