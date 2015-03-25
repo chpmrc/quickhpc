@@ -1,0 +1,27 @@
+#########################
+# customise these
+CFILES := monitor.c config.c
+PROG := monitor
+PAPI_DIR=./papi-5.4.1/src
+PAPI_OBJS= ${PAPI_DIR}/testlib/do_loops.o \
+	 ${PAPI_DIR}/testlib/test_utils.o \
+	 ${PAPI_DIR}/testlib/dummy.o \
+INCLUDES := asd
+CFLAGS := ${INCLUDES} -Wall -Wextra -g 
+LDFLAGS :=
+########################
+
+# -MMD generates dependencies while compiling
+CFLAGS += -MMD
+CC := clang
+
+OBJFILES := $(CFILES:.c=.o)
+DEPFILES := $(CFILES:.c=.d)
+
+$(PROG) : $(OBJFILES)
+	$(LINK.o) $(LDFLAGS) ${PAPI_OBJS} -o $@ $^
+
+clean :
+	rm -f $(PROG) $(OBJFILES) $(DEPFILES)
+
+-include $(DEPFILES)
