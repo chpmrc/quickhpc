@@ -3,3 +3,4 @@ monitor
 papi-examples
 papi_avail_output.txt
 data
+*.o
