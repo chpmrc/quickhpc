@@ -84,13 +84,12 @@ int main( int argc, char *argv[] )
         /* Start monitoring and print values */
         printf("\n");
         for (idx = 0; processAlive && (idx < cfg.iterations || cfg.iterations == -1); idx++) {
-            t1 = gettime();
+            // t1 = gettime();
             monitor(eventSet, values, cfg.interval);
-            t2 = gettime();
-            printf("Time to monitor: %lu\n", t2 - t1);
+            // t2 = gettime();
+            // printf("Time to monitor: %lu\n", t2 - t1);
             buildCSVLine(monitorLine, values[0], cfg.numEvents);
             printf("%s\n", monitorLine);
-            printf("Time to monitor: %lu\n", t2 - t1);
             if (kill(pid, 0) < 0) {
                 /* Process is not active anymore */
                 if (errno == ESRCH) {
@@ -98,7 +97,7 @@ int main( int argc, char *argv[] )
                 }
             }
             t2 = gettime();
-            printf("Time to end the loop: %lu\n", t2 - t1);
+            // printf("Time to end the loop: %lu\n", t2 - t1);
         }
         cleanup(&eventSet);
 
