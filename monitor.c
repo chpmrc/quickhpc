@@ -96,7 +96,7 @@ int main( int argc, char *argv[] )
                     processAlive = false;
                 }
             }
-            t2 = gettime();
+            // t2 = gettime();
             // printf("Time to end the loop: %lu\n", t2 - t1);
         }
         cleanup(&eventSet);
