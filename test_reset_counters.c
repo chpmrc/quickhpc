@@ -20,14 +20,14 @@ inline unsigned long gettime() {
 void initPapi();
 void initEventSet(int *);
 void addEvent(int, char *eventName);
-void monitor(int, long long **values);
+void monitor(int, long long **values, int useconds /* 0 means as fast as possible */);
 void buildCSVLine(char *line, long long *values, int numItems);
 void cleanup(int *eventSet);
 
 int main( int argc, char *argv[] )
 {
         int eventSet = PAPI_NULL;
-        // unsigned long t1, t2; // Used to measure timing of various calls
+        unsigned long t1, t2; // Used to measure timing of various calls
         int numEventSets = 1; // One set should be enough
         int idx;
         int retval;
@@ -81,29 +81,12 @@ int main( int argc, char *argv[] )
                 printf(",");
             }
         }
-        retval = PAPI_start( eventSet );
-        if ( retval != PAPI_OK )
-            test_fail_exit( __FILE__, __LINE__, "PAPI_start", retval );
         /* Start monitoring and print values */
         printf("\n");
         for (idx = 0; processAlive && (idx < cfg.iterations || cfg.iterations == -1); idx++) {
             // t1 = gettime();
-
-            monitor(eventSet, values);
-
-            // retval = PAPI_read( eventSet, values[0] );
-            // if ( retval != PAPI_OK )
-            //     test_fail_exit( __FILE__, __LINE__, "PAPI_read", retval );
-
-            // retval = PAPI_reset( eventSet );
-            // if ( retval != PAPI_OK )
-            //     test_fail_exit( __FILE__, __LINE__, "PAPI_reset", retval );
-
+            monitor(eventSet, values, cfg.interval);
             // t2 = gettime();
-
-            if (cfg.interval > 0)
-                usleep(cfg.interval);
-
             // printf("Time to monitor: %lu\n", t2 - t1);
             buildCSVLine(monitorLine, values[0], cfg.numEvents);
             printf("%s\n", monitorLine);
@@ -116,11 +99,6 @@ int main( int argc, char *argv[] )
             // t2 = gettime();
             // printf("Time to end the loop: %lu\n", t2 - t1);
         }
-
-        retval = PAPI_stop( eventSet, values[0]);
-        if ( retval != PAPI_OK )
-            test_fail_exit( __FILE__, __LINE__, "PAPI_stop", retval );
-        
         cleanup(&eventSet);
 
         exit(0);
@@ -169,19 +147,21 @@ void addEvent(int eventSet, char *eventName) {
     PAPI_event_name_to_code(eventName, &eventCode );
     retval = PAPI_add_event(eventSet, eventCode);
     if ( retval != PAPI_OK )
-        test_fail_exit( __FILE__, __LINE__, "PAPI_add_event", retval );
+            test_fail_exit( __FILE__, __LINE__, "PAPI_add_event", retval );
 }
 
-void monitor(int eventSet, long long **values) {
+void monitor(int eventSet, long long **values, int useconds /* 0 means as fast as possible */) {
     int retval;
 
-    retval = PAPI_read( eventSet, values[0] );
+    retval = PAPI_start( eventSet );
     if ( retval != PAPI_OK )
-        test_fail_exit( __FILE__, __LINE__, "PAPI_read", retval );
+        test_fail_exit( __FILE__, __LINE__, "PAPI_start", retval );
 
-    retval = PAPI_reset( eventSet );
+    usleep(useconds);
+
+    retval = PAPI_stop( eventSet, values[0] );
     if ( retval != PAPI_OK )
-        test_fail_exit( __FILE__, __LINE__, "PAPI_reset", retval );
+        test_fail_exit( __FILE__, __LINE__, "PAPI_stop", retval );
 }
 
 void buildCSVLine(char *line, long long *values, int numItems) {

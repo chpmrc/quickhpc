@@ -20,21 +20,29 @@ void reset_config(config *cfg) {
 
 void readEventNames(char *filePath, config *cfg) {
 	int i = 0;
+	size_t len = 0;
 	FILE *fp;
+	char *tempStr;
 	fp = fopen(filePath, "r");
 	if (fp == NULL) {
 		perror("Configuration file error:");
 		exit(1);
 	}
-	while (fscanf(fp, "%s", cfg->events[i]) != EOF){
-		i++;
+	while (getline(&tempStr, &len, fp) != -1){
+		if (tempStr[0] != '#') {
+			strncpy(cfg->events[i], tempStr, strlen(tempStr) - 1); // Remove final LF
+			i++;
+		}
 	}
+	free(tempStr);
 	cfg->numEvents = i;
 	// Test
-	printf("Monitoring the following events:\n");
+	printf("Monitoring %d events:\n", cfg->numEvents);
 	for (i = 0; i < cfg->numEvents; i++) {
 		printf("%s\n", cfg->events[i]);
 	}
+	printf("\n");
+	fclose(fp);
 }
 
 void setup_config(int argc, char **argv, config *cfg) {
