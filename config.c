@@ -11,7 +11,7 @@ bool attach; // True if the monitor has to attach to a given PID
 
 void reset_config(config *cfg) {
 	cfg->attach = false;
-	cfg->run = false;
+	cfg->run = false; // TODO not used
 	cfg->pid = -128;
 	cfg->numEvents = 0;
 	cfg->interval = 0; // As fast as possible

@@ -3,3 +3,5 @@ monitor
 papi-examples
 papi_avail_output.txt
 *.o
+spy_data
+victim_data
