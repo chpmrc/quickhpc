@@ -4,8 +4,10 @@ clear victim_data_orig;
 conf_fid = fopen('../events_example.conf');
 headers = ['NIL'];
 while ((header = fgetl(conf_fid)) != -1)
-	header(header == '_') = '-';
-	headers = [headers; header];
+	if (header(1) != '#')
+		header(header == '_') = '-';
+		headers = [headers; header];
+	end
 end
 headers = headers(2:end, :);
 % spy_headers = headers(headers) % TODO
