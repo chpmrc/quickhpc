@@ -12,7 +12,7 @@ all: config
 	${CC} ${INC} -g -Wall ${PROGRAM}.c \
 		${EXTERNAL_OBJS} \
 		${LIBS_STATIC} \
-		${OBJS} -o ${PROGRAM}
+		${OBJS} -o ../${PROGRAM}
 
 config:
 	${CC} ${INC} -g -c config.c
