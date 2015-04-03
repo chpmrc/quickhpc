@@ -23,6 +23,7 @@ void addEvent(int, char *eventName);
 void monitor(int, long long **values);
 void buildCSVLine(char *line, long long *values, int numItems);
 void cleanup(int *eventSet);
+void usage(char *name);
 
 int main( int argc, char *argv[] )
 {
@@ -37,6 +38,10 @@ int main( int argc, char *argv[] )
         pid_t pid = -1;
         config cfg;
         bool processAlive = true;
+
+        if (argc < 3) {
+            usage(argv[0]);
+        }
 
         initPapi();
 
@@ -217,4 +222,11 @@ void cleanup(int *eventSet) {
     retval = PAPI_destroy_eventset(eventSet);
     if (retval != PAPI_OK)
       test_fail_exit( __FILE__, __LINE__, "PAPI_destroy_eventset", retval );
+}
+
+void usage(char *name) {
+    printf("Usage: %s -a PID -c EVENTS_FILE [-i INTERVAL (usecs)] [-n SAMPLES]\n", name);
+    printf("\t(If no interval is specified the sampling is performed as quickly as possible)\n");
+    printf("\t(If no number of samples is specified the execution continues until either %s is killed or the attached process terminates)\n", name);
+    exit(1);
 }
