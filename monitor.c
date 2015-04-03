@@ -161,15 +161,24 @@ void initEventSet(int *eventSet) {
     if ( retval != PAPI_OK )
             test_fail( __FILE__, __LINE__, "PAPI_assign_eventset_component",
             retval );
+
+    /* Enable multiplexing to be able to probe more counters (less precision) */
+    // retval = PAPI_set_multiplex(*eventSet);
+    // if ( retval != PAPI_OK )
+    //         test_fail( __FILE__, __LINE__, "PAPI_set_multiplex",
+    //         retval );
 }
 
 void addEvent(int eventSet, char *eventName) {
     int eventCode = 0;
     int retval;
+    char msg[PAPI_MAX_STR_LEN];
     PAPI_event_name_to_code(eventName, &eventCode );
     retval = PAPI_add_event(eventSet, eventCode);
-    if ( retval != PAPI_OK )
-        test_fail_exit( __FILE__, __LINE__, "PAPI_add_event", retval );
+    if ( retval != PAPI_OK ) {
+        sprintf(msg, "PAPI_add_event (%s)", eventName);
+        test_fail_exit( __FILE__, __LINE__, msg, retval );
+    }
 }
 
 void monitor(int eventSet, long long **values) {
