@@ -28,7 +28,7 @@ void usage(char *name);
 int main( int argc, char *argv[] )
 {
         int eventSet = PAPI_NULL;
-        // unsigned long t1, t2; // Used to measure timing of various calls
+        unsigned long t1, t2; // Used to measure timing of various calls
         int numEventSets = 1; // One set should be enough
         int idx;
         int retval;
@@ -92,7 +92,9 @@ int main( int argc, char *argv[] )
         /* Start monitoring and print values */
         printf("\n");
         for (idx = 0; processAlive && (idx < cfg.iterations || cfg.iterations == -1); idx++) {
-            // t1 = gettime();
+#ifdef _DEBUG
+            t1 = gettime();
+#endif
 
             monitor(eventSet, values);
 
@@ -118,8 +120,10 @@ int main( int argc, char *argv[] )
                     processAlive = false;
                 }
             }
-            // t2 = gettime();
-            // printf("Time to end the loop: %lu\n", t2 - t1);
+#ifdef _DEBUG
+            t2 = gettime();
+            printf("Time for one sample: %lu\n", t2 - t1);
+#endif
         }
 
         retval = PAPI_stop( eventSet, values[0]);
