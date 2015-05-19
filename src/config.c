@@ -37,11 +37,11 @@ void readEventNames(char *filePath, config *cfg) {
 	free(tempStr);
 	cfg->numEvents = i;
 	// Test
-	printf("Monitoring %d events:\n", cfg->numEvents);
+	fprintf(stderr, "Monitoring %d events:\n", cfg->numEvents);
 	for (i = 0; i < cfg->numEvents; i++) {
-		printf("%s\n", cfg->events[i]);
+		fprintf(stderr, "%s\n", cfg->events[i]);
 	}
-	printf("\n");
+	fprintf(stderr, "\n");
 	fclose(fp);
 }
 
@@ -60,18 +60,18 @@ void setup_config(int argc, char **argv, config *cfg) {
 		// Configuration file
 		if (!strcmp(argv[i], "-c")) {
 			strcpy(configFilePath, argv[i+1]);
-			printf("Using config file: %s\n", configFilePath);
+			fprintf(stderr, "Using config file: %s\n", configFilePath);
 			readEventNames(configFilePath, cfg);
 		} else
 		if (!strcmp(argv[i], "-i")) {
 			interval = atoi(argv[i+1]);
-			printf("Using interval: %d usec\n", interval);
+			fprintf(stderr, "Using interval: %d usec\n", interval);
 			cfg->interval = interval;
 		} else
 		if (!strcmp(argv[i], "-n")) {
 			if (atoi(argv[i]) > -1)
 				strcpy(iterations, argv[i+1]);
-			printf("Monitoring for %s iterations\n", iterations);
+			fprintf(stderr, "Monitoring for %s iterations\n", iterations);
 			cfg->iterations = atoi(iterations);
 		} else
 		// Run new process

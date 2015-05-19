@@ -1,6 +1,7 @@
 #include <sys/ptrace.h>
 #include <limits.h>
 #include "config.h"
+#include <time.h>
 
 #ifdef _AIX
 #define _LINUX_SOURCE_COMPAT
@@ -17,6 +18,8 @@ inline unsigned long gettime() {
   return tl;
 }
 
+struct timespec timer_start();
+long timer_end(struct timespec start_time);
 void initPapi();
 void initEventSet(int *);
 void addEvent(int, char *eventName);
@@ -27,8 +30,12 @@ void usage(char *name);
 
 int main( int argc, char *argv[] )
 {
-        int eventSet = PAPI_NULL;
+#ifdef _DEBUG
         unsigned long t1, t2; // Used to measure timing of various calls
+        struct timespec vartime;
+        long time_elapsed_nanos;
+#endif
+        int eventSet = PAPI_NULL;
         int numEventSets = 1; // One set should be enough
         int idx;
         int retval;
@@ -59,11 +66,11 @@ int main( int argc, char *argv[] )
 
         if (cfg.attach) {
             pid = cfg.pid;
-            printf("Attaching to PID: %d\n", pid);
+            fprintf(stderr, "Attaching to PID: %d\n", pid);
         }
 
         if (pid < 0) {
-            printf("Please specify a PID to attach to with -a" /* or -r to run a process*/);
+            fprintf(stderr, "Please specify a PID to attach to with -a" /* or -r to run a process*/);
         }
 
         initEventSet(&eventSet);
@@ -79,51 +86,49 @@ int main( int argc, char *argv[] )
         values = allocate_test_space(numEventSets, cfg.numEvents);
 
         /* Print CSV headers */
-        printf("\n");
+        fprintf(stderr, "\n");
         for (idx = 0; idx < cfg.numEvents; idx++) {
-            printf("%s", cfg.events[idx]);
+            fprintf(stderr, "%s", cfg.events[idx]);
             if (idx < cfg.numEvents - 1) {
-                printf(",");
+                fprintf(stderr, ",");
             }
         }
         retval = PAPI_start( eventSet );
         if ( retval != PAPI_OK )
             test_fail_exit( __FILE__, __LINE__, "PAPI_start", retval );
         /* Start monitoring and print values */
-        printf("\n");
+        fprintf(stderr, "\n");
         for (idx = 0; processAlive && (idx < cfg.iterations || cfg.iterations == -1); idx++) {
 #ifdef _DEBUG
             t1 = gettime();
+            vartime = timer_start();  // begin a timer called 'vartime'
 #endif
-
             monitor(eventSet, values);
-
             // retval = PAPI_read( eventSet, values[0] );
             // if ( retval != PAPI_OK )
             //     test_fail_exit( __FILE__, __LINE__, "PAPI_read", retval );
-
             // retval = PAPI_reset( eventSet );
             // if ( retval != PAPI_OK )
             //     test_fail_exit( __FILE__, __LINE__, "PAPI_reset", retval );
-
-            // t2 = gettime();
-
+#ifdef _DEBUG
+            time_elapsed_nanos = timer_end(vartime);
+            t2 = gettime();
+            fprintf(stderr, "Time for one sample (cycles, RDTSC): %lu\n", t2 - t1);
+            fprintf(stderr, "Time for one sample (nanoseconds, clock_gettime): %lu\n", time_elapsed_nanos);
+#endif      
             if (cfg.interval > 0)
                 usleep(cfg.interval);
 
-            // printf("Time to monitor: %lu\n", t2 - t1);
+            // fprintf(stderr, "Time to monitor: %lu\n", t2 - t1);
             buildCSVLine(monitorLine, values[0], cfg.numEvents);
-            printf("%s\n", monitorLine);
+            fprintf(stdout, "%s\n", monitorLine);
+            fflush(stdout);
             if (kill(pid, 0) < 0) {
                 /* Process is not active anymore */
                 if (errno == ESRCH) {
                     processAlive = false;
                 }
             }
-#ifdef _DEBUG
-            t2 = gettime();
-            printf("Time for one sample: %lu\n", t2 - t1);
-#endif
         }
 
         retval = PAPI_stop( eventSet, values[0]);
@@ -205,7 +210,7 @@ void monitor(int eventSet, long long **values) {
 void buildCSVLine(char *line, long long *values, int numItems) {
     int i = 0;
     if (values == NULL || numItems <= 0) {
-        printf("Error: invalid CSV line! (%s, line %d)\n", __FILE__, __LINE__);
+        fprintf(stderr, "Error: invalid CSV line! (%s, line %d)\n", __FILE__, __LINE__);
         exit(1);
     }
     for (; i < numItems; i++) {
@@ -229,8 +234,23 @@ void cleanup(int *eventSet) {
 }
 
 void usage(char *name) {
-    printf("Usage: %s -a PID -c EVENTS_FILE [-i INTERVAL (usecs)] [-n SAMPLES]\n", name);
-    printf("\t(If no interval is specified the sampling is performed as quickly as possible)\n");
-    printf("\t(If no number of samples is specified the execution continues until either %s is killed or the attached process terminates)\n", name);
+    fprintf(stderr, "Usage: %s -a PID -c EVENTS_FILE [-i INTERVAL (usecs)] [-n SAMPLES]\n", name);
+    fprintf(stderr, "\t(If no interval is specified the sampling is performed as quickly as possible)\n");
+    fprintf(stderr, "\t(If no number of samples is specified the execution continues until either %s is killed or the attached process terminates)\n", name);
     exit(1);
+}
+
+// call this function to start a nanosecond-resolution timer
+struct timespec timer_start(){
+    struct timespec start_time;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_time);
+    return start_time;
+}
+
+// call this function to end a timer, returning nanoseconds elapsed as a long
+long timer_end(struct timespec start_time){
+    struct timespec end_time;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_time);
+    long diffInNanos = end_time.tv_nsec - start_time.tv_nsec;
+    return diffInNanos;
 }

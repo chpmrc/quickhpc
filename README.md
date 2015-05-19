@@ -44,7 +44,7 @@ Excellent format to be used for plotting, statistical analysis etc. in Octave/Ma
 
 * Collect data during an openssl signature for 1000 iterations (each iteration is as fast as `papi_clockres` reports):
 
-`./openssl-1.0.1e/apps/openssl dgst -sha1 -sign test_data/private.pem test_data/test.pdf & monitor -a ${!} -c ~/Projects/flushreload_agent/papi/events.conf -n 10000 > data`
+`./openssl-root/apps/openssl dgst -sha1 -sign test_data/private.pem test_data/test.pdf & monitor -a ${!} -c ~/Projects/flushreload_agent/papi/events.conf -n 10000 > data`
 
 * Collect data about process 1234 for 100 iterations of 100 ms each:
 

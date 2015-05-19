@@ -11,6 +11,6 @@ cd ${OPENSSL_DIR}
 
 ${SPY_DIR}/spy ${OPENSSL_DIR}/openssl.probe > /dev/null & 
 ${MONITOR_DIR}/monitor -a ${!} -c ${MONITOR_DIR}/conf/events_example.conf > ${CLASSIF_DIR}/data/spy_data.csv & 
-${VICTIM_DIR}/openssl-1.0.1e/apps/openssl dgst -sha1 -sign ${VICTIM_DIR}/test_data/private.pem ${VICTIM_DIR}/test_data/test.pdf > /dev/null & 
+${VICTIM_DIR}/openssl-root/apps/openssl dgst -sha1 -sign ${VICTIM_DIR}/test_data/private.pem ${VICTIM_DIR}/test_data/test.pdf > /dev/null & 
 ${MONITOR_DIR}/monitor -a ${!} -c ${MONITOR_DIR}/conf/events_example.conf > ${CLASSIF_DIR}/data/victim_data.csv; killall spy
 
