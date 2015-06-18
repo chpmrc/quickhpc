@@ -1,13 +1,13 @@
 # Build
 
-* Untar and build PAPI (./configure; make is enough)
-* Run make
+* Untar and build PAPI (`./configure; make` is enough)
+* Run `make`
 
 That's it!
 
 # Usage
 
-`./monitor OPTIONS`
+`./quickhpc OPTIONS`
 
 where `OPTIONS` can be:
 
@@ -38,17 +38,17 @@ The output of the program is organized as CSV data complete with headers and (fo
 	130775,28,144
 	...
 
-Excellent format to be used for plotting, statistical analysis etc. in Octave/Matlab.
+A sane, standard format.
 
 # Example
 
 * Collect data during an openssl signature for 1000 iterations (each iteration is as fast as `papi_clockres` reports):
 
-`./openssl-root/apps/openssl dgst -sha1 -sign test_data/private.pem test_data/test.pdf & monitor -a ${!} -c ~/Projects/flushreload_agent/papi/events.conf -n 10000 > data`
+`./openssl-root/apps/openssl dgst -sha1 -sign test_data/private.pem test_data/test.pdf & quickhpc -a ${!} -c ~/Projects/flushreload_agent/papi/events.conf -n 10000 > data`
 
 * Collect data about process 1234 for 100 iterations of 100 ms each:
 
-`monitor -a 1234 -n 100 -i 100000 -c my_events.conf`
+`quickhpc -a 1234 -n 100 -i 100000 -c my_events.conf`
 
 # Events file
 
