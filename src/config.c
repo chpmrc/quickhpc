@@ -31,6 +31,7 @@ void readEventNames(char *filePath, config *cfg) {
 	while (getline(&tempStr, &len, fp) != -1){
 		if (tempStr[0] != '#') {
 			strncpy(cfg->events[i], tempStr, strlen(tempStr) - 1); // Remove final LF
+			cfg->events[i][strlen(tempStr) - 1] = '\0';
 			i++;
 		}
 	}

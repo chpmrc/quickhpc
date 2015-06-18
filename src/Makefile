@@ -1,5 +1,5 @@
 CC=gcc
-PROGRAM=monitor
+PROGRAM=quickhpc
 PAPI_DIR=./papi-5.4.1/src
 LIBS_STATIC=${PAPI_DIR}/libpapi.a
 OBJS=config.o

@@ -34,6 +34,8 @@ int main( int argc, char *argv[] )
         unsigned long t1, t2; // Used to measure timing of various calls
         struct timespec vartime;
         long time_elapsed_nanos;
+        long samples = 0;
+        double time_sum = 0;
 #endif
         int eventSet = PAPI_NULL;
         int numEventSets = 1; // One set should be enough
@@ -115,6 +117,8 @@ int main( int argc, char *argv[] )
             t2 = gettime();
             fprintf(stderr, "Time for one sample (cycles, RDTSC): %lu\n", t2 - t1);
             fprintf(stderr, "Time for one sample (nanoseconds, clock_gettime): %lu\n", time_elapsed_nanos);
+            samples++;
+            time_sum += time_elapsed_nanos;
 #endif      
             if (cfg.interval > 0)
                 usleep(cfg.interval);
@@ -136,6 +140,10 @@ int main( int argc, char *argv[] )
             test_fail_exit( __FILE__, __LINE__, "PAPI_stop", retval );
         
         cleanup(&eventSet);
+
+#ifdef _DEBUG
+        fprintf(stderr, "Mean sampling time: %f\n", time_sum / samples);
+#endif
 
         exit(0);
 }
