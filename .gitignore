@@ -1,7 +1,5 @@
 papi-5.4.1
-monitor
+quickhpc
 papi-examples
 papi_avail_output.txt
 *.o
-spy_data
-victim_data
