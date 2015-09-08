@@ -1,3 +1,7 @@
+# Why this tool?
+
+You could use `perf-stat` (included in Linux) but its minimum resolution is 100 ms. This tool reached a resolution of 3 microseconds in some cases. More than 30000 times faster! I used this tool for some of my projects and even though it is extremely simple I could not find anything similar online (suggestions are welcome). So here it is.
+
 # Build
 
 * Untar and build [PAPI](http://icl.cs.utk.edu/papi/) (`./configure; make` is enough)
