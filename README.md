@@ -44,7 +44,7 @@ A sane, standard format.
 
 * Collect data during an openssl signature for 1000 iterations (each iteration is as fast as `papi_clockres` reports):
 
-`./openssl-root/apps/openssl dgst -sha1 -sign test_data/private.pem test_data/test.pdf & quickhpc -a ${!} -c ~/Projects/flushreload_agent/papi/events.conf -n 10000 > data`
+`openssl dgst -sha1 -sign test_data/private.pem test_data/test.pdf & quickhpc -a ${!} -c ~/papi/events.conf -n 10000 > data`
 
 * Collect data about process 1234 for 100 iterations of 100 ms each:
 
