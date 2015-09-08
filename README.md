@@ -1,6 +1,6 @@
 # Build
 
-* Untar and build PAPI (`./configure; make` is enough)
+* Untar and build [PAPI](http://icl.cs.utk.edu/papi/) (`./configure; make` is enough)
 * Run `make`
 
 That's it!
