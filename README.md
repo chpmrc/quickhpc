@@ -4,7 +4,9 @@ You could use `perf-stat` (included in Linux) but its minimum resolution is 100 
 
 # Build
 
-* Untar and build [PAPI](http://icl.cs.utk.edu/papi/) (`./configure; make` is enough)
+* Download and untar [PAPI](http://icl.cs.utk.edu/papi/)
+* Set the right path to PAPI's folder in the `Makefile` (variable `PAPI_DIR`)
+* Build PAPI (`./configure; make` is enough)
 * Run `make`
 
 That's it!
