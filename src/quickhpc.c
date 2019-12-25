@@ -1,7 +1,11 @@
 #include <sys/ptrace.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <limits.h>
 #include "config.h"
 #include <time.h>
+#include <errno.h>
+#include <unistd.h>
 
 #ifdef _AIX
 #define _LINUX_SOURCE_COMPAT
@@ -83,7 +87,7 @@ int main( int argc, char *argv[] )
 
         retval = PAPI_attach( eventSet, ( unsigned long ) pid );
         if ( retval != PAPI_OK )
-                test_fail_exit( __FILE__, __LINE__, "PAPI_attach", retval );
+                test_fail( __FILE__, __LINE__, "PAPI_attach", retval );
 
         values = allocate_test_space(numEventSets, cfg.numEvents);
 
@@ -97,7 +101,7 @@ int main( int argc, char *argv[] )
         }
         retval = PAPI_start( eventSet );
         if ( retval != PAPI_OK )
-            test_fail_exit( __FILE__, __LINE__, "PAPI_start", retval );
+            test_fail( __FILE__, __LINE__, "PAPI_start", retval );
         /* Start monitoring and print values */
         fprintf(stderr, "\n");
         for (idx = 0; processAlive && (idx < cfg.iterations || cfg.iterations == -1); idx++) {
@@ -108,10 +112,10 @@ int main( int argc, char *argv[] )
             monitor(eventSet, values);
             // retval = PAPI_read( eventSet, values[0] );
             // if ( retval != PAPI_OK )
-            //     test_fail_exit( __FILE__, __LINE__, "PAPI_read", retval );
+            //     test_fail( __FILE__, __LINE__, "PAPI_read", retval );
             // retval = PAPI_reset( eventSet );
             // if ( retval != PAPI_OK )
-            //     test_fail_exit( __FILE__, __LINE__, "PAPI_reset", retval );
+            //     test_fail( __FILE__, __LINE__, "PAPI_reset", retval );
 #ifdef _DEBUG
             time_elapsed_nanos = timer_end(vartime);
             t2 = gettime();
@@ -137,7 +141,7 @@ int main( int argc, char *argv[] )
 
         retval = PAPI_stop( eventSet, values[0]);
         if ( retval != PAPI_OK )
-            test_fail_exit( __FILE__, __LINE__, "PAPI_stop", retval );
+            test_fail( __FILE__, __LINE__, "PAPI_stop", retval );
         
         cleanup(&eventSet);
 
@@ -154,10 +158,10 @@ void initPapi(){
     const PAPI_component_info_t *cmpinfo;
     retval = PAPI_library_init( PAPI_VER_CURRENT );
     if ( retval != PAPI_VER_CURRENT )
-            test_fail_exit( __FILE__, __LINE__, "PAPI_library_init", retval );
+            test_fail( __FILE__, __LINE__, "PAPI_library_init", retval );
 
     if ( ( cmpinfo = PAPI_get_component_info( 0 ) ) == NULL )
-            test_fail_exit( __FILE__, __LINE__, "PAPI_get_component_info", 0 );
+            test_fail( __FILE__, __LINE__, "PAPI_get_component_info", 0 );
 
     if ( cmpinfo->attach == 0 )
             test_skip( __FILE__, __LINE__, "Platform does not support attaching",
@@ -165,7 +169,7 @@ void initPapi(){
 
     hw_info = PAPI_get_hardware_info(  );
     if ( hw_info == NULL )
-            test_fail_exit( __FILE__, __LINE__, "PAPI_get_hardware_info", 0 );
+            test_fail( __FILE__, __LINE__, "PAPI_get_hardware_info", 0 );
 }
 
 void initEventSet(int *eventSet) {
@@ -175,7 +179,7 @@ void initEventSet(int *eventSet) {
        platform */
     retval = PAPI_create_eventset(eventSet);
     if ( retval != PAPI_OK )
-            test_fail_exit( __FILE__, __LINE__, "PAPI_create_eventset", retval );
+            test_fail( __FILE__, __LINE__, "PAPI_create_eventset", retval );
 
     /* Here we are testing that this does not cause a fail */
 
@@ -199,7 +203,7 @@ void addEvent(int eventSet, char *eventName) {
     retval = PAPI_add_event(eventSet, eventCode);
     if ( retval != PAPI_OK ) {
         sprintf(msg, "PAPI_add_event (%s)", eventName);
-        test_fail_exit( __FILE__, __LINE__, msg, retval );
+        test_fail( __FILE__, __LINE__, msg, retval );
     }
 }
 
@@ -208,11 +212,11 @@ void monitor(int eventSet, long long **values) {
 
     retval = PAPI_read( eventSet, values[0] );
     if ( retval != PAPI_OK )
-        test_fail_exit( __FILE__, __LINE__, "PAPI_read", retval );
-
+        test_fail( __FILE__, __LINE__, "PAPI_read", retval );
+	
     retval = PAPI_reset( eventSet );
     if ( retval != PAPI_OK )
-        test_fail_exit( __FILE__, __LINE__, "PAPI_reset", retval );
+        test_fail( __FILE__, __LINE__, "PAPI_reset", retval );
 }
 
 void buildCSVLine(char *line, long long *values, int numItems) {
@@ -234,11 +238,11 @@ void cleanup(int *eventSet) {
     int retval;
     retval = PAPI_cleanup_eventset(*eventSet);
     if (retval != PAPI_OK)
-      test_fail_exit( __FILE__, __LINE__, "PAPI_cleanup_eventset", retval );
+      test_fail( __FILE__, __LINE__, "PAPI_cleanup_eventset", retval );
 
     retval = PAPI_destroy_eventset(eventSet);
     if (retval != PAPI_OK)
-      test_fail_exit( __FILE__, __LINE__, "PAPI_destroy_eventset", retval );
+      test_fail( __FILE__, __LINE__, "PAPI_destroy_eventset", retval );
 }
 
 void usage(char *name) {

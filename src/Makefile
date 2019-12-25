@@ -1,11 +1,11 @@
 CC=gcc
 PROGRAM=quickhpc
-PAPI_DIR=./papi-5.4.1/src
+PAPI_DIR=../../papi/src
 LIBS_STATIC=${PAPI_DIR}/libpapi.a
 OBJS=config.o
 EXTERNAL_OBJS=${PAPI_DIR}/testlib/do_loops.o \
 	 ${PAPI_DIR}/testlib/test_utils.o \
-	 ${PAPI_DIR}/testlib/dummy.o
+#	 ${PAPI_DIR}/testlib/dummy.o
 INC=-I${PAPI_DIR} -I${PAPI_DIR} -I${PAPI_DIR}/testlib
 
 
