@@ -1,4 +1,5 @@
 Fix bugs due to incompatible to the latest PAPI and includes headers.
+Forked from the original quickhpc here: https://github.com/chpmrc/quickhpc
 
 # Why this tool?
 
