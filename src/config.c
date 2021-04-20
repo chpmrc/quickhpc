@@ -1,8 +1,8 @@
-#include "config.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include "config.h"
 
 bool attach; // True if the monitor has to attach to a given PID
 	bool run; // True if the monitor has to start the command given as argument
